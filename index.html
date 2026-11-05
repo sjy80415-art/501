@@ -9,7 +9,41 @@
 @media (prefers-color-scheme:dark){:root{--bg:#12161b;--card:#1b2128;--text:#e8edf2;--sub:#9aa7b4;--line:#2d3640;--brand:#7fb2e0;--brand-soft:#243445;--accent:#6fcf9f;--warn:#f0b35c;--warn-bg:#35290f}}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--text);font-family:"Malgun Gothic","맑은 고딕","Apple SD Gothic Neo",system-ui,sans-serif;line-height:1.65;font-size:15px}
-.wrap{max-width:920px;margin:0 auto;padding:32px 16px 64px}
+.wrap{max-width:1400px;margin:0 auto;padding:32px 16px 64px}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:24px;align-items:start}
+.chat{position:sticky;top:16px;height:calc(100vh - 32px);display:flex;flex-direction:column;background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.chat-head{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border-bottom:1px solid var(--line);background:var(--brand-soft)}
+.chat-head strong{color:var(--brand)}
+.chat .x{display:none;border:0;background:none;color:var(--text);font-size:18px;cursor:pointer}
+.chat details{padding:8px 14px;border-bottom:1px solid var(--line);font-size:13px}
+.chat summary{cursor:pointer;font-weight:600;padding:4px 0}
+.chat details label{display:block;margin:8px 0 0;color:var(--sub);font-size:12px}
+.chat details input{display:block;width:100%;margin-top:3px;padding:7px 9px;font:inherit;font-size:13px;color:var(--text);background:var(--bg);border:1px solid var(--line);border-radius:6px}
+.chat .hint{margin:8px 0 2px;font-size:12px;color:var(--sub);line-height:1.5}
+.msgs{flex:1;overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;gap:10px}
+.m{max-width:92%;padding:8px 12px;border-radius:12px;font-size:14px;line-height:1.55;white-space:pre-wrap;word-break:break-word}
+.m.user{align-self:flex-end;background:var(--brand-soft);border:1px solid var(--line)}
+.m.bot{align-self:flex-start;background:var(--bg);border:1px solid var(--line)}
+.m.sys{align-self:center;max-width:100%;font-size:12px;color:var(--sub);background:none;border:1px dashed var(--line)}
+.m.err{align-self:flex-start;color:var(--warn);background:var(--warn-bg);border:1px solid transparent}
+.chips{display:flex;flex-wrap:wrap;gap:6px;padding:0 14px 8px}
+.chips button{font:inherit;font-size:12px;padding:4px 10px;border-radius:999px;border:1px solid var(--line);background:var(--bg);color:var(--text);cursor:pointer}
+.chips button:hover{border-color:var(--brand)}
+.chat form{display:flex;gap:8px;padding:10px 14px;border-top:1px solid var(--line)}
+.chat textarea{flex:1;resize:none;padding:8px 10px;font:inherit;font-size:14px;color:var(--text);background:var(--bg);border:1px solid var(--line);border-radius:8px}
+.chat form button{align-self:stretch;padding:0 14px;font:inherit;font-size:14px;border:0;border-radius:8px;background:var(--brand);color:#fff;cursor:pointer}
+@media (prefers-color-scheme:dark){.chat form button{color:#0b1520}}
+.chat form button:disabled{opacity:.5;cursor:not-allowed}
+.fab{display:none;position:fixed;right:16px;bottom:16px;z-index:40;padding:12px 18px;border:0;border-radius:999px;background:var(--brand);color:#fff;font:inherit;font-weight:700;box-shadow:0 4px 14px rgba(0,0,0,.25);cursor:pointer}
+@media (prefers-color-scheme:dark){.fab{color:#0b1520}}
+@media (max-width:1100px){
+  .layout{grid-template-columns:minmax(0,1fr)}
+  .chat{position:fixed;inset:0;height:auto;border-radius:0;z-index:50;display:none}
+  .chat.open{display:flex}
+  .chat .x{display:block}
+  .fab{display:block}
+}
+@media print{.chat,.fab{display:none!important}.layout{display:block}}
 header h1{margin:0 0 4px;font-size:26px;color:var(--brand)}
 header .sub{color:var(--sub);margin:0 0 16px}
 .meta{display:flex;flex-wrap:wrap;gap:8px 24px;padding:12px 16px;background:var(--card);border:1px solid var(--line);border-radius:10px;font-size:14px}
@@ -41,13 +75,18 @@ td p{margin:0 0 4px}td p:last-child{margin:0}
 .checks label{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid var(--line);cursor:pointer}
 .checks label:last-child{border-bottom:0}
 .checks input{margin-top:5px;width:16px;height:16px;accent-color:var(--accent)}
+.badge{display:inline-block;font-size:12px;border-radius:999px;padding:1px 8px;border:1px solid var(--line);color:var(--sub);white-space:nowrap}
+.badge.new{color:var(--warn);background:var(--warn-bg);border-color:transparent}
+code,pre{font-family:Consolas,"D2Coding",monospace;font-size:13px}
+pre{margin:0;padding:12px 14px;background:var(--card);border:1px solid var(--line);border-radius:10px;overflow-x:auto;line-height:1.5}
+.rules{margin:8px 0 0;padding-left:20px}
 footer{margin-top:40px;font-size:12px;color:var(--sub);text-align:center}
 @media print{body{background:#fff;color:#000}.card,.tablewrap,.summary,.checks,.step,.meta{break-inside:avoid}}
 @media (max-width:560px){h2{font-size:17px}tbody th{width:120px}}
 </style>
 </head>
 <body>
-<div class="wrap">
+<div class="wrap"><div class="layout"><main id="dash">
 
 <header>
   <h1>업무 기반 AI PoC 기획서</h1>
@@ -150,6 +189,32 @@ footer{margin-top:40px;font-size:12px;color:var(--sub);text-align:center}
 <thead><tr><th>확산 계획</th><th>내용</th></tr></thead>
 <tbody><tr><th>다음 단계</th><td>PoC 검증 → 인사 시스템(사번/Knox) 연동 검토 → 규칙·리포트 템플릿 자산화 → 월 정기 운영 편입 (입사기념일 등 다른 기념일로 확대)</td></tr></tbody></table></div>
 
+<h2>4. MCP 연동 설계</h2>
+<p class="lead">Claude가 날짜를 직접 계산하지 않고, MCP(Model Context Protocol) 도구가 돌려준 값만 사용해 검토 리포트를 만들도록 구성합니다. 아래 서버는 PoC에서 구축·연결할 <strong>설계안</strong>이며 서버명과 도구명은 예시입니다.</p>
+<div class="tablewrap"><table>
+<thead><tr><th>MCP 서버(안)</th><th>역할</th><th>주요 도구(예시)</th><th>권한 / 상태</th></tr></thead>
+<tbody>
+<tr><td><code>lunar-calendar</code></td><td>음력↔양력 변환 (한국천문연구원 음양력 데이터 기반)</td><td><code>lunar_to_solar(year, month, day, is_leap)</code></td><td>읽기 전용 <span class="badge new">신규 구축</span></td></tr>
+<tr><td><code>hr-directory</code></td><td>사번·Knox ID로 구성원 조회, 동명이인 후보 반환, 재직상태 확인</td><td><code>get_employee(emp_id)</code><br><code>find_by_name(name)</code></td><td>읽기 전용, 필요한 필드만 노출 <span class="badge new">인사팀 협의 필요</span></td></tr>
+<tr><td><code>business-day</code></td><td>공휴일·주말을 반영한 발송 기준일 계산</td><td><code>adjust_date(date, direction)</code></td><td>읽기 전용 <span class="badge new">신규 구축</span></td></tr>
+<tr><td><code>gift-ledger</code> (선택)</td><td>연도별 발송 이력 기록, 중복 발송 방지</td><td><code>list_sent(emp_id, year)</code><br><code>record_sent(...)</code></td><td>쓰기는 담당자 승인 후에만 <span class="badge">2단계</span></td></tr>
+</tbody></table></div>
+
+<h3>호출 흐름 예시</h3>
+<pre>1. Claude  → hr-directory.find_by_name("김민수")      → 후보 2명 (사번·부서·Knox ID)
+2. Claude  → lunar-calendar.lunar_to_solar(2027, 3, 15, false) → 양력 일자
+3. Claude  → business-day.adjust_date(양력 일자, "before")      → 발송 기준일
+4. Claude  → 월별 검토 리포트(HTML) 생성, 예외 항목은 담당자 확인란으로 표시
+5. 담당자  → 확인·승인 후 발송 (gift-ledger 기록은 승인 이후)</pre>
+
+<h3>운영 원칙</h3>
+<ul class="rules">
+  <li>날짜는 MCP 도구 결과만 사용하고, Claude가 추정·계산하지 않습니다.</li>
+  <li>도구는 조회 전용으로 시작하고, 쓰기 도구는 사람 승인을 거칩니다.</li>
+  <li>인사 정보는 사번·Knox ID·부서·생일 등 필요한 항목만 노출하고, 호출 로그를 남깁니다.</li>
+  <li>MCP 서버는 사내 승인된 환경에서만 실행하며, 외부 서비스로 구성원 정보를 보내지 않습니다.</li>
+</ul>
+
 <h2>착수 전 확인란</h2>
 <div class="checks" id="checks">
   <label><input type="checkbox"> 윤달 생일 처리 방식 확정 (평달 동일 날짜 / 윤달 해에는 윤달 날짜)</label>
@@ -158,9 +223,31 @@ footer{margin-top:40px;font-size:12px;color:var(--sub);text-align:center}
   <label><input type="checkbox"> 현재 소요 시간·오류 건수 등 <span class="ph">[ ]</span> 항목 기입</label>
   <label><input type="checkbox"> 생일 정보 수집·이용 고지 및 접근 권한 확인 (개인정보)</label>
   <label><input type="checkbox"> 사내 승인된 환경에서 Claude에 데이터 입력 가능 여부 확인</label>
+  <label><input type="checkbox"> MCP 서버(음양력 변환·인사 조회) 구축 담당자 및 인사팀 접근 승인 확인</label>
 </div>
 
 <footer>조직문화 담당 송진영 · 2026-11-05 · 생일 관리 자동화 PoC</footer>
+</main>
+
+<aside id="chat" class="chat" aria-label="데이터 질문 챗봇">
+  <div class="chat-head"><strong>데이터 질문 챗봇</strong><button type="button" id="chatClose" class="x" aria-label="닫기">✕</button></div>
+  <details id="cfg" open>
+    <summary>모델 설정</summary>
+    <label>model_name<input id="cfgModel" type="text" autocomplete="off" spellcheck="false" placeholder="모델 이름 입력"></label>
+    <label>base_url<input id="cfgBase" type="text" autocomplete="off" spellcheck="false" placeholder="https://서버주소/v1"></label>
+    <label>api_key<input id="cfgKey" type="password" autocomplete="off" placeholder="API 키 입력"></label>
+    <p class="hint">OpenAI 호환 방식(<code>/chat/completions</code>)으로 호출합니다. API 키는 저장되지 않으며 새로고침하면 다시 입력해야 합니다. 질문할 때 이 페이지의 내용이 입력한 base_url 서버로 전송됩니다.</p>
+  </details>
+  <div id="msgs" class="msgs" role="log" aria-live="polite"></div>
+  <div id="chips" class="chips"></div>
+  <form id="chatForm">
+    <textarea id="q" rows="2" placeholder="대시보드 데이터에 대해 질문하세요 (Enter 전송, Shift+Enter 줄바꿈)"></textarea>
+    <button id="send" type="submit">전송</button>
+    <button id="stop" type="button" hidden>중지</button>
+  </form>
+</aside>
+</div>
+<button id="chatToggle" class="fab" type="button">챗봇</button>
 </div>
 <script>
 (function(){
@@ -169,6 +256,123 @@ footer{margin-top:40px;font-size:12px;color:var(--sub);text-align:center}
   boxes.forEach(function(b){b.addEventListener("change",function(){
     try{localStorage.setItem(KEY,JSON.stringify([].map.call(boxes,function(x){return x.checked})));}catch(e){}
   });});
+})();
+</script>
+<script>
+(function(){
+  var $=function(id){return document.getElementById(id)};
+  var STORE={model:"poc-chat-model",base:"poc-chat-base"};
+  var history=[], ctrl=null, busy=false;
+
+  // 모델명·base_url만 편의상 기억 (api_key는 저장하지 않음)
+  try{$("cfgModel").value=localStorage.getItem(STORE.model)||"";$("cfgBase").value=localStorage.getItem(STORE.base)||"";}catch(e){}
+  function remember(){try{localStorage.setItem(STORE.model,$("cfgModel").value.trim());localStorage.setItem(STORE.base,$("cfgBase").value.trim());}catch(e){}}
+
+  // ---- 대시보드 데이터를 텍스트로 직렬화 (질문할 때마다 현재 화면 기준) ----
+  function txt(el){
+    var c=el.cloneNode(true);
+    c.querySelectorAll("p,br,li").forEach(function(x){x.after(" ")});
+    return c.textContent.replace(/\s+/g," ").trim();
+  }
+  function ser(el){
+    var t=el.tagName, cl=el.classList, out=[];
+    if(/^H[1-3]$/.test(t)) return "\n"+"#".repeat(+t.charAt(1))+" "+txt(el);
+    if(t==="TABLE"){
+      return Array.prototype.map.call(el.rows,function(r){
+        return "- "+Array.prototype.map.call(r.cells,txt).join(" | ");
+      }).join("\n");
+    }
+    if(cl.contains("tablewrap")) return ser(el.querySelector("table"));
+    if(cl.contains("cards")) return Array.prototype.map.call(el.children,function(c){
+      return "- "+txt(c.querySelector(".k"))+": "+txt(c.querySelector(".v"))+" ("+txt(c.querySelector(".d"))+")";
+    }).join("\n");
+    if(cl.contains("flow")) return Array.prototype.map.call(el.children,function(s){return "- "+txt(s)}).join("\n");
+    if(cl.contains("checks")) return Array.prototype.map.call(el.querySelectorAll("label"),function(l){
+      return "- ["+(l.querySelector("input").checked?"완료":"미완료")+"] "+txt(l);
+    }).join("\n");
+    if(t==="PRE") return el.textContent.trim();
+    if(t==="UL"||t==="OL") return Array.prototype.map.call(el.children,function(li){return "- "+txt(li)}).join("\n");
+    if(t==="HEADER"||t==="SECTION"){
+      Array.prototype.forEach.call(el.children,function(ch){
+        if(ch.classList.contains("meta")) out.push(Array.prototype.map.call(ch.children,txt).join(" / "));
+        else out.push(ser(ch));
+      });
+      return out.join("\n");
+    }
+    return txt(el);
+  }
+  function dashboardText(){
+    return Array.prototype.map.call($("dash").children,ser).filter(Boolean).join("\n");
+  }
+
+  var SYSTEM="당신은 '생일 관리 자동화 PoC 기획서' 대시보드의 데이터 도우미입니다. 아래 [대시보드 데이터]에 있는 내용만 근거로 한국어로 답하세요.\n"+
+   "규칙:\n1) 데이터에 없는 내용은 추측하지 말고 '대시보드에 해당 정보가 없습니다'라고 답하세요.\n"+
+   "2) 답변의 근거가 된 섹션·항목명을 괄호로 표시하세요. 예: (1. 문제 정의 > 핵심 문제)\n"+
+   "3) '[ ]'는 아직 입력되지 않은 값입니다. 이 값으로 숫자를 만들거나 계산 결과를 지어내지 마세요.\n"+
+   "4) 음력→양력 등 날짜를 직접 계산하지 마세요.\n5) 간결하게 답하세요.\n\n[대시보드 데이터]\n";
+
+  // ---- UI ----
+  function add(cls,text){
+    var d=document.createElement("div"); d.className="m "+cls; d.textContent=text;
+    $("msgs").appendChild(d); $("msgs").scrollTop=$("msgs").scrollHeight; return d;
+  }
+  function setBusy(b){busy=b;$("send").disabled=b;$("send").hidden=b;$("stop").hidden=!b;$("q").disabled=b;}
+  add("sys","위 설정을 입력한 뒤, 이 대시보드의 데이터에 대해 질문하세요. 답변은 대시보드에 적힌 내용만 근거로 합니다.");
+  ["핵심 문제가 뭐야?","KPI를 요약해줘","아직 비어 있는 항목은?","착수 전 미완료 확인사항은?","MCP 서버는 어떻게 구성돼?"].forEach(function(s){
+    var b=document.createElement("button"); b.type="button"; b.textContent=s;
+    b.addEventListener("click",function(){ask(s)}); $("chips").appendChild(b);
+  });
+
+  function buildUrl(base){
+    base=base.trim().replace(/\/+$/,"");
+    if(!/^https?:\/\//i.test(base)) throw new Error("base_url은 http:// 또는 https://로 시작해야 합니다.");
+    return /\/chat\/completions$/.test(base)?base:base+"/chat/completions";
+  }
+
+  async function ask(question){
+    question=(question||"").trim();
+    if(!question||busy) return;
+    var model=$("cfgModel").value.trim(), base=$("cfgBase").value.trim(), key=$("cfgKey").value.trim();
+    if(!model||!base||!key){
+      $("cfg").open=true; add("err","model_name, base_url, api_key를 모두 입력해 주세요."); return;
+    }
+    var url;
+    try{url=buildUrl(base);}catch(e){$("cfg").open=true;add("err",e.message);return;}
+    remember();
+    add("user",question); $("q").value="";
+    var pending=add("bot","답변 생성 중…");
+    var messages=[{role:"system",content:SYSTEM+dashboardText()}].concat(history.slice(-12),[{role:"user",content:question}]);
+    ctrl=new AbortController(); setBusy(true);
+    var timer=setTimeout(function(){ctrl.abort()},90000);
+    try{
+      var res=await fetch(url,{method:"POST",signal:ctrl.signal,
+        headers:{"Content-Type":"application/json","Authorization":"Bearer "+key},
+        body:JSON.stringify({model:model,messages:messages,temperature:0.2})});
+      if(!res.ok){
+        var body=""; try{body=(await res.text()).slice(0,300);}catch(e){}
+        throw new Error("요청 실패 (HTTP "+res.status+")"+(body?"\n"+body:""));
+      }
+      var data=await res.json();
+      var ans=data&&data.choices&&data.choices[0]&&data.choices[0].message&&data.choices[0].message.content;
+      if(typeof ans!=="string"||!ans.trim()) throw new Error("응답 형식을 해석하지 못했습니다. OpenAI 호환 /chat/completions 응답인지 확인해 주세요.");
+      pending.textContent=ans.trim();
+      history.push({role:"user",content:question},{role:"assistant",content:ans.trim()});
+    }catch(e){
+      pending.className="m err";
+      pending.textContent=e.name==="AbortError"?"요청이 중지되었거나 시간이 초과되었습니다.":
+        (e instanceof TypeError?"서버에 연결하지 못했습니다. base_url, 네트워크, 서버의 CORS 허용 여부를 확인해 주세요.":e.message);
+    }finally{
+      clearTimeout(timer); ctrl=null; setBusy(false); $("msgs").scrollTop=$("msgs").scrollHeight; $("q").focus();
+    }
+  }
+
+  $("chatForm").addEventListener("submit",function(e){e.preventDefault();ask($("q").value)});
+  $("q").addEventListener("keydown",function(e){
+    if(e.key==="Enter"&&!e.shiftKey&&!e.isComposing){e.preventDefault();ask($("q").value)}
+  });
+  $("stop").addEventListener("click",function(){if(ctrl)ctrl.abort()});
+  $("chatToggle").addEventListener("click",function(){$("chat").classList.add("open")});
+  $("chatClose").addEventListener("click",function(){$("chat").classList.remove("open")});
 })();
 </script>
 </body>
