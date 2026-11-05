@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>생일 관리 자동화 PoC 기획서</title>
+<style>
+:root{--bg:#f5f7fa;--card:#fff;--text:#1d2733;--sub:#5b6773;--line:#dfe5ec;--brand:#1f4e79;--brand-soft:#dce6f1;--accent:#2f7d5b;--warn:#b26a00;--warn-bg:#fff4e0}
+@media (prefers-color-scheme:dark){:root{--bg:#12161b;--card:#1b2128;--text:#e8edf2;--sub:#9aa7b4;--line:#2d3640;--brand:#7fb2e0;--brand-soft:#243445;--accent:#6fcf9f;--warn:#f0b35c;--warn-bg:#35290f}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:"Malgun Gothic","맑은 고딕","Apple SD Gothic Neo",system-ui,sans-serif;line-height:1.65;font-size:15px}
+.wrap{max-width:920px;margin:0 auto;padding:32px 16px 64px}
+header h1{margin:0 0 4px;font-size:26px;color:var(--brand)}
+header .sub{color:var(--sub);margin:0 0 16px}
+.meta{display:flex;flex-wrap:wrap;gap:8px 24px;padding:12px 16px;background:var(--card);border:1px solid var(--line);border-radius:10px;font-size:14px}
+.meta b{color:var(--sub);font-weight:600;margin-right:6px}
+h2{font-size:19px;color:var(--brand);margin:40px 0 12px;padding-bottom:6px;border-bottom:2px solid var(--brand)}
+h3{font-size:16px;margin:24px 0 8px}
+.lead{color:var(--sub);margin:0 0 12px}
+.summary{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--brand);border-radius:10px;padding:14px 20px;margin-top:20px}
+.summary ol{margin:6px 0 0;padding-left:20px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin:16px 0}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+.card .k{font-size:12px;color:var(--sub)}
+.card .v{font-size:22px;font-weight:700;color:var(--accent);margin:2px 0}
+.card .d{font-size:13px;color:var(--sub)}
+.tablewrap{overflow-x:auto;background:var(--card);border:1px solid var(--line);border-radius:10px}
+table{border-collapse:collapse;width:100%;min-width:560px}
+th,td{padding:10px 14px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line);font-size:14px}
+thead th{background:var(--brand);color:#fff}
+@media (prefers-color-scheme:dark){thead th{color:#0b1520}}
+tbody th{background:var(--brand-soft);width:170px;font-weight:600}
+tr:last-child th,tr:last-child td{border-bottom:0}
+td p{margin:0 0 4px}td p:last-child{margin:0}
+.ph{color:var(--warn);background:var(--warn-bg);border-radius:4px;padding:0 4px;white-space:nowrap}
+.note{font-size:13px;color:var(--sub);margin:8px 0 0}
+.flow{display:flex;flex-wrap:wrap;gap:8px;align-items:stretch;margin:12px 0}
+.step{flex:1 1 150px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:13px}
+.step b{display:block;color:var(--brand);margin-bottom:2px}
+.checks{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:8px 16px}
+.checks label{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid var(--line);cursor:pointer}
+.checks label:last-child{border-bottom:0}
+.checks input{margin-top:5px;width:16px;height:16px;accent-color:var(--accent)}
+footer{margin-top:40px;font-size:12px;color:var(--sub);text-align:center}
+@media print{body{background:#fff;color:#000}.card,.tablewrap,.summary,.checks,.step,.meta{break-inside:avoid}}
+@media (max-width:560px){h2{font-size:17px}tbody th{width:120px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>업무 기반 AI PoC 기획서</h1>
+  <p class="sub">구성원 생일(음력·양력) 관리 및 선물 발송 자동화</p>
+  <div class="meta">
+    <span><b>작성자</b>조직문화 담당 송진영</span>
+    <span><b>작성일</b>2026-11-05</span>
+    <span><b>PoC 기간</b>4주</span>
+    <span><b>대상</b>구성원 300명</span>
+  </div>
+</header>
+
+<section class="summary" aria-label="요약">
+  <strong>요약</strong>
+  <ol>
+    <li>구성원 300명의 생일 선물을 매월 발송하는데, 음력 생일의 양력 환산 검토와 동명이인 재조회에 시간이 많이 듭니다.</li>
+    <li>사번을 고유키로 쓰고 음력→양력 변환을 공식 데이터로 자동화해, 월별 발송 대상과 예외 항목을 리포트로 만듭니다.</li>
+    <li>4주 PoC로 검토 시간 80% 이상 절감, 동명이인 재조회 0건, 환산 정확도 100%를 검증합니다.</li>
+  </ol>
+</section>
+
+<div class="cards">
+  <div class="card"><div class="k">검토 시간</div><div class="v">−80% 이상</div><div class="d">현재 연 <span class="ph">[ ]</span>시간</div></div>
+  <div class="card"><div class="k">동명이인 재조회</div><div class="v">0건</div><div class="d">현재 월 <span class="ph">[ ]</span>건</div></div>
+  <div class="card"><div class="k">양력 환산 정확도</div><div class="v">100%</div><div class="d">샘플 <span class="ph">[ ]</span>명 만세력 대조</div></div>
+  <div class="card"><div class="k">발송 오류</div><div class="v">0건</div><div class="d">현재 <span class="ph">[ ]</span>건</div></div>
+</div>
+
+<h2>1. 문제 정의</h2>
+<p class="lead">조직문화 업무에서 반복적이고·검토에 시간이 많이 들며·사람 확인에 의존하는 지점을 찾습니다. (구성원 300명 생일 선물 발송: 음력 생일 환산 / 동명이인 식별)</p>
+<div class="tablewrap"><table>
+<thead><tr><th>항목</th><th>내용</th></tr></thead>
+<tbody>
+<tr><th>담당 업무 &amp; 현황</th><td><p>조직문화 담당자가 구성원 300명(양력·음력 생일자 혼재)의 생일 선물을 매월 발송하고 있음.</p><p>음력 생일은 매년 양력 날짜가 달라 해마다 변환·검토가 필요함.</p></td></tr>
+<tr><th>핵심 문제<br>(Pain Point)</th><td><p>① 음력→양력 변환·검토를 매년 수작업으로 진행 (연 <span class="ph">[ ]</span>시간 소요, 윤달·말일 오류 위험)</p><p>② 동명이인을 Knox ID/사번으로 건마다 재조회 (월 <span class="ph">[ ]</span>건)</p><p>③ 입퇴사·부서이동 반영 지연으로 누락·오발송 가능성</p></td></tr>
+<tr><th>의사결정 질문</th><td>이번 달 생일 선물을 누구에게, 언제 보내야 하는가? (동일인 여부·재직 여부·양력 환산일 확인)</td></tr>
+<tr><th>현재 판단 근거와 한계</th><td>담당자 경험과 수기 확인에 의존, 이름 기반 조회라 동명이인 구분이 사후적, 변환 결과를 검증할 기준 데이터 없음</td></tr>
+<tr><th>선정 과제</th><td>음력→양력 자동 변환 + 사번 기반 식별 + 월별 발송 대상·검토 리포트 자동 생성</td></tr>
+</tbody></table></div>
+
+<h2>2. AI PoC 설계</h2>
+<div class="tablewrap"><table>
+<thead><tr><th>항목</th><th>내용</th></tr></thead>
+<tbody>
+<tr><th>PoC 목표 &amp; 가설</th><td>가설: 사번을 고유키로 쓰고 음력→양력 변환을 공식 데이터로 자동화하면, 연간 검토 시간을 80% 이상 줄이고 동명이인 재조회를 없앨 수 있다.</td></tr>
+<tr><th>적용 범위</th><td><p>대상: 구성원 300명 전체 (음력 생일자 <span class="ph">[ ]</span>명 포함)</p><p>품목: 월별 생일 선물 발송</p><p>기간: PoC 4주 (2027년 연간 생일 캘린더 생성 + 익월 발송분 시범 운영)</p></td></tr>
+<tr><th>활용 데이터</th><td><p>인사 명단(사번·Knox ID·이름·부서·재직상태), 본인 등록 생일(양/음력·윤달 여부), 음양력 변환 기준 데이터(한국천문연구원 공공 API 등), 연도별 발송 이력</p><p>※ 개인정보이므로 접근 권한 제한, 사내 승인된 저장소에서만 처리</p></td></tr>
+<tr><th>AI 적용 방식</th><td><p>날짜 변환은 AI가 아닌 공식 데이터·코드로 처리(LLM 직접 계산 금지)</p><p>Claude 활용: ① 엑셀 데이터 정제·동명이인 후보 점검 ② 예외 항목(윤달·29/30일·휴직) 분류 ③ 월별 검토 리포트·축하 문구 생성</p></td></tr>
+<tr><th>출력물 &amp; 사람 개입 지점</th><td><p>월별 발송 대상 리스트(사번·Knox ID·부서 병기) + 예외 항목 표 → 최종 발송 확정은 담당자 승인</p><p>윤달·말일·주말 처리 정책 미정 건은 담당자가 판단</p></td></tr>
+</tbody></table></div>
+
+<h3>처리 흐름</h3>
+<div class="flow">
+  <div class="step"><b>① 명단 등록</b>사번 기준 마스터 명단 (Knox ID·생일·음/양력·윤달)</div>
+  <div class="step"><b>② 연초 일괄 변환</b>음력 → 해당 연도 양력, 연간 캘린더 생성</div>
+  <div class="step"><b>③ 월별 자동 추출</b>익월 생일자, 동명이인은 사번·부서 병기</div>
+  <div class="step"><b>④ 예외 검토</b>윤달·말일·휴직 등만 담당자 확인</div>
+  <div class="step"><b>⑤ 발송·이력</b>발송일·선물 종류 기록</div>
+</div>
+
+<h3>성공 지표(KPI)</h3>
+<div class="tablewrap"><table>
+<thead><tr><th>성공 지표(KPI)</th><th>현재값</th><th>목표값</th><th>측정 방법</th></tr></thead>
+<tbody>
+<tr><td>음력 생일 검토 시간</td><td>연 <span class="ph">[ ]</span>시간</td><td>80% 이상 절감</td><td>작업 시간 기록 (Before/After)</td></tr>
+<tr><td>동명이인 재조회 건수</td><td>월 <span class="ph">[ ]</span>건</td><td>0건 (사번 자동 식별)</td><td>조회 로그 확인</td></tr>
+<tr><td>양력 환산 정확도 · 발송 오류</td><td>오류 <span class="ph">[ ]</span>건</td><td>정확도 100%, 오류 0건</td><td>샘플 <span class="ph">[ ]</span>명 공식 만세력 대조, 발송 후 점검</td></tr>
+</tbody></table></div>
+
+<h3>추진 일정</h3>
+<div class="tablewrap"><table>
+<thead><tr><th>주차</th><th>활동</th><th>산출물</th></tr></thead>
+<tbody>
+<tr><td>1~2주</td><td>정책 확정(윤달·29/30일·주말 처리), 마스터 명단 정리(사번 키), 변환·식별 로직 구현, 연간 생일 캘린더 생성</td><td>마스터 명단, 규칙 정의서, 연간 생일 캘린더 초안</td></tr>
+<tr><td>3~4주</td><td>샘플 <span class="ph">[ ]</span>명 환산 정확도 검증, 익월 발송분 시범 운영, KPI 측정 및 결과 보고</td><td>검증 결과표, 월별 검토 리포트(HTML), PoC 결과 보고서</td></tr>
+</tbody></table></div>
+<p class="note">※ 실행 기한은 실제 일정이나 업무에 따라 수정해 주세요.</p>
+
+<h2>3. Claude 활용 및 비즈니스 가치</h2>
+<p class="lead">Claude로 월별 검토 결과를 단일 HTML 파일(인라인 CSS)로 생성해 담당자가 바로 열람·확인하도록 합니다. (날짜 계산은 변환된 값을 입력으로 사용)</p>
+<div class="tablewrap"><table>
+<thead><tr><th>항목</th><th>내용</th></tr></thead>
+<tbody>
+<tr><th>활용 시나리오</th><td>월별 생일자 검토 리포트 생성: 익월 생일자(양력 환산일 포함)·동명이인 식별 정보·예외 항목을 한눈에 보는 대시보드 / 연초 연간 생일 캘린더 점검</td></tr>
+<tr><th>프롬프트 설계</th><td>역할(조직문화 운영 보조) · 맥락(월별 생일자 데이터) · 과업(예외 분류, 리포트 작성) · 제약(날짜 계산·추정 금지, 입력된 변환값만 사용, 근거 명시, 개인정보 최소 표시) · 출력형식(HTML)</td></tr>
+<tr><th>HTML 산출물 구성</th><td>요약 3줄(대상 수·음력 비중·예외 건수) → 핵심 지표 카드 → 일자별 발송 캘린더 → 상세 표(사번·Knox ID·부서·양력 환산일) → 예외 항목·확인란</td></tr>
+</tbody></table></div>
+
+<h3>기대 효과</h3>
+<div class="tablewrap"><table>
+<thead><tr><th>기대 효과</th><th>산정 근거</th><th>연간 가치</th></tr></thead>
+<tbody>
+<tr><td>시간 절감</td><td>(연 <span class="ph">[ ]</span>h 검토 + 월 <span class="ph">[ ]</span>h 재조회) × 80% 절감 × 시간당 인건비 <span class="ph">[ ]</span>원</td><td><span class="ph">[ ]</span>원</td></tr>
+<tr><td>비용 절감</td><td>오발송·누락 재발송 연 <span class="ph">[ ]</span>건 × 건당 선물가·배송비 <span class="ph">[ ]</span>원</td><td><span class="ph">[ ]</span>원</td></tr>
+<tr><td>품질/속도 향상</td><td>발송 대상 확정 리드타임 <span class="ph">[ ]</span>일 → 당일, 누락·오발송 0건, 수령 정확성에 따른 구성원 만족도 향상</td><td>정성 효과</td></tr>
+</tbody></table></div>
+
+<h3>확산 계획</h3>
+<div class="tablewrap"><table>
+<thead><tr><th>확산 계획</th><th>내용</th></tr></thead>
+<tbody><tr><th>다음 단계</th><td>PoC 검증 → 인사 시스템(사번/Knox) 연동 검토 → 규칙·리포트 템플릿 자산화 → 월 정기 운영 편입 (입사기념일 등 다른 기념일로 확대)</td></tr></tbody></table></div>
+
+<h2>착수 전 확인란</h2>
+<div class="checks" id="checks">
+  <label><input type="checkbox"> 윤달 생일 처리 방식 확정 (평달 동일 날짜 / 윤달 해에는 윤달 날짜)</label>
+  <label><input type="checkbox"> 29·30일 생일이 없는 달의 처리 확정 (전일 / 익일)</label>
+  <label><input type="checkbox"> 주말·공휴일 발송 기준일 확정 (직전 / 직후 영업일)</label>
+  <label><input type="checkbox"> 현재 소요 시간·오류 건수 등 <span class="ph">[ ]</span> 항목 기입</label>
+  <label><input type="checkbox"> 생일 정보 수집·이용 고지 및 접근 권한 확인 (개인정보)</label>
+  <label><input type="checkbox"> 사내 승인된 환경에서 Claude에 데이터 입력 가능 여부 확인</label>
+</div>
+
+<footer>조직문화 담당 송진영 · 2026-11-05 · 생일 관리 자동화 PoC</footer>
+</div>
+<script>
+(function(){
+  var KEY="birthday-poc-checks", boxes=document.querySelectorAll("#checks input");
+  try{var s=JSON.parse(localStorage.getItem(KEY)||"[]");boxes.forEach(function(b,i){b.checked=!!s[i]});}catch(e){}
+  boxes.forEach(function(b){b.addEventListener("change",function(){
+    try{localStorage.setItem(KEY,JSON.stringify([].map.call(boxes,function(x){return x.checked})));}catch(e){}
+  });});
+})();
+</script>
+</body>
+</html>
